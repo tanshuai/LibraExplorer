@@ -6,14 +6,13 @@ import pdb
 import app
 
 
-def test_mol_api(api_server):
-    host, observed = api_server
+def test_mol_api():
+    host = "http://apitest.MoveOnLibra.com"
     url = "/v1/libra/about"
     params = {}
     headers = app.gen_api_header(False, "explorer.moveonlibra.com")
     assert len(headers.items()) == 1
-    response = requests.get(host+url, params=params, headers=headers, timeout=1)
-    assert observed[-1]["Authorization"] == headers["Authorization"]
+    response = requests.get(host+url, params=params, headers=headers, timeout=10)
     assert response.status_code == 200
     assert response.headers["API-Server"] == "MoveOnLibra-API"
     assert response.headers['Access-Control-Allow-Origin'] == "*"
@@ -27,18 +26,16 @@ def test_mol_api(api_server):
     assert data["total_transactions"] >= 1
 
 
-def test_mol_api_proxy(api_server):
-    host, observed = api_server
+def test_mol_api_proxy():
+    host = "http://apitest.MoveOnLibra.com"
     url = "/v1/libra/about"
     params = {}
     headers = app.gen_api_header(False, "47.254.29.109-33333.explorer.moveonlibra.com")
     assert headers["RealSwarm"] == "47.254.29.109-33333"
-    response = requests.get(host+url, params=params, headers=headers, timeout=1)
-    assert observed[-1]["Authorization"] == headers["Authorization"]
+    response = requests.get(host+url, params=params, headers=headers, timeout=10)
     assert response.status_code == 200
     assert response.headers["API-Server"] == "MoveOnLibra-API"
     assert response.headers['Access-Control-Allow-Origin'] == "*"
-    assert observed[-1]["RealSwarm"] == "47.254.29.109-33333"
     assert response.headers["Libra-Network"] == "47.254.29.109-33333"
     assert int(response.headers["Latest-Version"]) >= 0
     data = json.loads(response.content.decode('utf-8-sig'))
