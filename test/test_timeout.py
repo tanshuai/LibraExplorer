@@ -21,6 +21,7 @@ def test_application_reports_transport_error(monkeypatch, api_server, error_type
         raise error_type("controlled transport failure")
 
     monkeypatch.setattr(app, "api_host", lambda: host)
+    monkeypatch.setattr(app, "jwt_header", lambda: {"Authorization": "Bearer unit-only-synthetic"})
     monkeypatch.setattr(app.requests, "get", fail)
     with app.app.test_request_context("/", base_url="http://explorer.moveonlibra.com"):
         with pytest.raises(InternalServerError):

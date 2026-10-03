@@ -25,7 +25,10 @@ def api_server():
                 "total_transactions": 1,
             }
             body = json.dumps(data).encode("utf-8")
-            self.send_response(200)
+            status = self.headers.get("X-Fixture-Status", "200")
+            if status == "500-then-200":
+                status = "500" if len(observed) == 1 else "200"
+            self.send_response(int(status))
             self.send_header("API-Server", "MoveOnLibra-API")
             self.send_header("Access-Control-Allow-Origin", "*")
             self.send_header("Libra-network", proxy or "testnet")
